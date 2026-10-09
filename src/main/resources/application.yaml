@@ -1,0 +1,61 @@
+spring:
+  application:
+    name: gateway
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: messmate.in
+
+server:
+  port: 8080
+
+
+  # ==============================
+  # Gateway Routes
+  # ==============================
+
+gateway:
+  #    security:
+  #      enabled: true
+  #      key-store-location: classpath:certs/private-key.pem
+  #      key-store-password: euihde9834uien094uhfi
+  #      public-paths:
+  #        - /api/auth/**
+  #        - /api/public/**
+  routes:
+    - id: auth-service-route
+      path: /api/auth/**
+      service: auth-service
+
+    - id: user-service-route
+      path: /api/users/**
+      service: user-service
+
+    - id: order-service-route
+      path: /api/orders/**
+      service: order-service
+
+    - id: admin-service-route
+      path: /api/admin/**
+      service: admin-service
+
+
+  # ==============================
+  # Gateway Services
+  # ==============================
+
+  services:
+    user-service:
+      instances:
+        - id: user-1
+          uri: http://localhost:9090
+
+        - id: user-2
+          uri: http://localhost:9095
+
+    order-service:
+      instances:
+        - id: order-1
+          uri: http://localhost:9091
