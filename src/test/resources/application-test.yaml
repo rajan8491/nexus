@@ -1,0 +1,21 @@
+gateway:
+#  security:
+#    enabled: true
+#    private-key-location: classpath:certs/test-private-key.pem
+#    public-paths:
+#      - /api/public/**
+
+  services:
+    user-service:
+      instances:
+        - id: test-user-1
+          uri: http://localhost:9090 # WireMock port
+
+  routes:
+    - id: public-user-route
+      path: /api/public/users/**
+      service: user-service
+
+    - id: secure-user-route
+      path: /api/users/**
+      service: user-service

@@ -2,14 +2,19 @@ spring:
   application:
     name: gateway
 
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          issuer-uri: messmate.in
+#  security:
+#    oauth2:
+#      resourceserver:
+#        jwt:
+#          issuer-uri: messmate.in
 
 server:
   port: 8080
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
 
 
   # ==============================
@@ -24,6 +29,65 @@ gateway:
   #      public-paths:
   #        - /api/auth/**
   #        - /api/public/**
+
+  # Global default algorithm if not specified per service
+  default-load-balancer: ROUND_ROBIN
+
+  # Background health check settings
+  health-check:
+    enabled: true
+    interval-seconds: 10
+    timeout-millis: 2000
+    path: /actuator/health
+
+  rate-limiting:
+    enabled: true
+    default-algorithm: TOKEN_BUCKET
+    rules:
+      - id: default-rule
+        path: /**
+        method: GET
+        key-type: IP
+        algorithm: FIXED_WINDOW
+        capacity: 5
+        window-seconds: 60
+
+      # Rule 1: High-burst Token Bucket for public catalog requests
+      - id: catalog-rule
+        path: /api/catalog/**
+        method: GET
+        key-type: IP
+        algorithm: TOKEN_BUCKET
+        capacity: 100         # Maximum burst
+        refill-rate: 20       # 20 tokens per second
+
+      # Rule 2: Strict Fixed Window for sensitive authentication requests
+      - id: login-rule
+        path: /api/auth/login
+        method: POST
+        key-type: IP
+        algorithm: FIXED_WINDOW
+        capacity: 5           # Max 5 attempts
+        window-seconds: 60    # per 60 seconds
+
+      # Rule 3: Sliding Window based on an API key header for checkout
+      - id: order-checkout-rule
+        path: /api/orders/**
+        method: POST
+        key-type: HEADER
+        header-name: X-API-KEY
+        algorithm: SLIDING_WINDOW
+        capacity: 30          # Max 30 requests
+        window-seconds: 60    # within any moving 60-second window
+
+      # Rule 4: Catch-all fallback default
+      - id: default-api-rule
+        path: /**
+        key-type: IP
+        algorithm: TOKEN_BUCKET
+        capacity: 50
+        refill-rate: 10
+
   routes:
     - id: auth-service-route
       path: /api/auth/**
@@ -48,6 +112,7 @@ gateway:
 
   services:
     user-service:
+      load-balancer: ROUND_ROBIN # Explicit algorithm
       instances:
         - id: user-1
           uri: http://localhost:9090
@@ -55,7 +120,17 @@ gateway:
         - id: user-2
           uri: http://localhost:9095
 
+        - id: user-3
+          uri: http://localhost:9096
+
     order-service:
+      load-balancer: RANDOM # Pluggable alternative algorithm
       instances:
         - id: order-1
           uri: http://localhost:9091
+
+    inventory-service:
+      # load-balancer omitted: defaults cleanly to ROUND_ROBIN
+      instances:
+        - id: inv-1
+          uri: http://localhost:9092

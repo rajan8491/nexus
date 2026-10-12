@@ -1,12 +1,12 @@
 package com.nexus.gateway.handler;
 
+import com.nexus.gateway.domain.RouteDefinition;
+import com.nexus.gateway.domain.ServiceDefinition;
+import com.nexus.gateway.domain.ServiceInstance;
 import com.nexus.gateway.loadbalancer.LoadBalancer;
 import com.nexus.gateway.proxy.RequestForwarder;
 import com.nexus.gateway.proxy.TargetUriBuilder;
-import com.nexus.gateway.route.RouteDefinition;
 import com.nexus.gateway.route.RouteResolver;
-import com.nexus.gateway.service.ServiceDefinition;
-import com.nexus.gateway.service.ServiceInstance;
 import com.nexus.gateway.service.ServiceResolver;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -66,12 +66,5 @@ public class GatewayHandler {
                 exchange,
                 targetUri
         );
-
-//        return Mono.just(
-//                ResponseEntity.ok(
-//                        ("Forward to " + targetUri)
-//                                .getBytes()
-//                )
-//        );
     }
 }

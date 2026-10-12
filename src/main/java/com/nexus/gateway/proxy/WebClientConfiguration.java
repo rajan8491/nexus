@@ -1,4 +1,4 @@
-package com.nexus.gateway.config;
+package com.nexus.gateway.proxy;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

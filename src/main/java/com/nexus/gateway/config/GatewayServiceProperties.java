@@ -7,9 +7,9 @@ import java.util.List;
 
 public record GatewayServiceProperties(
 
-        @NotEmpty(
-                message = "Service must contain at least one instance"
-        )
+        String loadBalancer, // Optional: if omitted, registry falls back to global default
+
+        @NotEmpty(message = "Each service must define at least one active instance")
         List<@Valid GatewayServiceInstanceProperties> instances
 
 ) {
