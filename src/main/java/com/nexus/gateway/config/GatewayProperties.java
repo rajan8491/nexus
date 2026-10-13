@@ -11,6 +11,8 @@ import java.util.Map;
 @Validated
 @ConfigurationProperties(prefix = "gateway")
 public record GatewayProperties(
+        @Valid
+        GatewayHttpClientProperties httpClient,
 
         @Valid
         GatewaySecurityProperties security,

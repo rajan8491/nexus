@@ -21,9 +21,9 @@ public class ActiveHealthChecker {
     private final WebClient webClient;
     private final Set<String> unhealthyInstanceIds = ConcurrentHashMap.newKeySet();
 
-    public ActiveHealthChecker(GatewayRegistry registry, WebClient.Builder webClientBuilder) {
+    public ActiveHealthChecker(GatewayRegistry registry, WebClient webClient) {
         this.registry = registry;
-        this.webClient = webClientBuilder.build();
+        this.webClient = webClient;
     }
 
     @PostConstruct

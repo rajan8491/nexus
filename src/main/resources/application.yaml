@@ -30,6 +30,17 @@ gateway:
   #        - /api/auth/**
   #        - /api/public/**
 
+  # HTTP Client Configuration
+  http-client:
+    max-connections: 500
+    pending-acquire-max-count: 1000
+    pending-acquire-timeout: 5s
+    max-idle-time: 30s
+    max-life-time: 5m
+    connect-timeout: 3s
+    response-timeout: 10s
+    read-timeout: 10s
+
   # Global default algorithm if not specified per service
   default-load-balancer: ROUND_ROBIN
 

@@ -16,10 +16,13 @@ public class DefaultTargetUriBuilder
             ServerWebExchange exchange
     ) {
 
+        String rawPath = exchange.getRequest().getURI().getRawPath();
+        String rawQuery = exchange.getRequest().getURI().getRawQuery();
+
         return UriComponentsBuilder
                 .fromUri(serviceUri)
-                .path(exchange.getRequest().getURI().getPath())
-                .query(exchange.getRequest().getURI().getRawQuery())
+                .path(rawPath)
+                .query(rawQuery)
                 .build(true)
                 .toUri();
     }

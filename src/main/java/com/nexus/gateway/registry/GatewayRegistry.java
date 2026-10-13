@@ -1,5 +1,6 @@
 package com.nexus.gateway.registry;
 
+import com.nexus.gateway.config.GatewayHttpClientProperties;
 import com.nexus.gateway.config.GatewayProperties;
 import com.nexus.gateway.config.GatewaySecurityProperties;
 import com.nexus.gateway.domain.*;
@@ -17,9 +18,9 @@ import java.util.concurrent.ConcurrentHashMap;
 public class GatewayRegistry {
 
     private final GatewayProperties properties;
-
     private final Map<String, RouteDefinition> routesById = new ConcurrentHashMap<>();
     private final Map<String, ServiceDefinition> servicesByName = new ConcurrentHashMap<>();
+    private HttpClientDefinition httpClientDefinition;
     @Getter
     private HealthCheckConfig healthCheckConfig;
 
@@ -103,6 +104,24 @@ public class GatewayRegistry {
                 servicesByName.put(serviceName, new ServiceDefinition(serviceName, lbAlgorithm, instances));
             });
         }
+
+        var httpProps = properties.httpClient() != null ? properties.httpClient()
+                : new GatewayHttpClientProperties(null, null, null, null, null, null, null, null);
+
+        this.httpClientDefinition = new HttpClientDefinition(
+                httpProps.maxConnections(),
+                httpProps.pendingAcquireMaxCount(),
+                httpProps.pendingAcquireTimeout(),
+                httpProps.maxIdleTime(),
+                httpProps.maxLifeTime(),
+                httpProps.connectTimeout(),
+                httpProps.responseTimeout(),
+                httpProps.readTimeout()
+        );
+    }
+
+    public HttpClientDefinition getHttpClientConfig() {
+        return httpClientDefinition;
     }
 
     public GatewaySecurityProperties getSecurityConfig() {

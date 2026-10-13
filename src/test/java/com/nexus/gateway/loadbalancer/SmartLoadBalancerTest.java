@@ -65,21 +65,16 @@ class SmartLoadBalancerTest {
                 null,
                 null,
                 null,
+                null,
                 List.of(),
                 Map.of()
         );
 
         GatewayRegistry registry = new GatewayRegistry(properties);
-        return new ActiveHealthChecker(registry, WebClient.builder());
+        return new ActiveHealthChecker(registry, WebClient.create());
     }
 
-    private static final class SelectingStrategy implements LoadBalancerStrategy {
-
-        private final ServiceInstance selectedInstance;
-
-        private SelectingStrategy(ServiceInstance selectedInstance) {
-            this.selectedInstance = selectedInstance;
-        }
+    private record SelectingStrategy(ServiceInstance selectedInstance) implements LoadBalancerStrategy {
 
         @Override
         public String getAlgorithm() {
